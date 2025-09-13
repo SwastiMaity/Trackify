@@ -1,0 +1,13 @@
+<button (click)="sendSOS()" class="sos-btn">
+  <span *ngIf="!loading">🚨 SOS</span>
+  <span *ngIf="loading">Locating…</span>
+</button>
+
+<div class="meta" *ngIf="lastCoords || errorMsg">
+  <div *ngIf="lastCoords">
+    <p>Latitude: {{ lastCoords?.lat }}</p>
+    <p>Longitude: {{ lastCoords?.lon }}</p>
+    <p>Timestamp: {{ lastCoords?.timestamp }}</p>
+  </div>
+  <div class="error" *ngIf="errorMsg">{{ errorMsg }}</div>
+</div>
