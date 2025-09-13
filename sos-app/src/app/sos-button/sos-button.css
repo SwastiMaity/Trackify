@@ -1,0 +1,24 @@
+.sos-btn {
+  background: red;
+  color: white;
+  font-size: 2rem;
+  padding: 1.5rem 3rem;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  margin: 2rem;
+}
+
+.sos-btn:active {
+  background: darkred;
+}
+
+.meta {
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+.error {
+  color: darkred;
+  font-weight: bold;
+}

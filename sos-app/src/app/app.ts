@@ -1,12 +1,19 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
+import { SosButton } from './sos-button/sos-button';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { provideRouter, RouterModule } from '@angular/router';
+import { routes } from './app-router';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [SosButton ,RouterModule],             // ✅ import child component
+
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrls: ['./app.css'],
+  template: `<router-outlet></router-outlet>`
 })
-export class App {
-  protected readonly title = signal('sos-app');
-}
+export class AppComponent {}
+bootstrapApplication(AppComponent, {
+  providers: [provideRouter(routes)]
+});
