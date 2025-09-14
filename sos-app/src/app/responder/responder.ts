@@ -28,7 +28,7 @@ export class Responder implements AfterViewInit, OnDestroy {
   }
 
   fetchAlerts() {
-    fetch('/alerts')   // your backend endpoint
+  fetch('https://olivaceous-bobette-winterless.ngrok-free.app/alerts')   // backend endpoint
       .then(res => res.json())
       .then((data: { lat: number, lon: number, timestamp: string }[]) => {
         // Remove old markers

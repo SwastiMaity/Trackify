@@ -1,1 +1,31 @@
-<div id="map"></div>
+<div class="admin-container">
+	<!-- Login Form -->
+	<div *ngIf="!isLoggedIn" class="login-form">
+		<h2>Admin Login</h2>
+		<form (ngSubmit)="login()">
+			<label for="username">Username:</label>
+			<input id="username" [(ngModel)]="username" name="username" required>
+			<label for="password">Password:</label>
+			<input id="password" type="password" [(ngModel)]="password" name="password" required>
+			<button type="submit">Login</button>
+			<div class="error" *ngIf="loginError">{{ loginError }}</div>
+		</form>
+	</div>
+
+	<!-- Admin Controls & Map -->
+	<div *ngIf="isLoggedIn" class="admin-panel">
+		<div class="controls">
+			<button (click)="refreshAlerts()">Refresh Alerts</button>
+			<button (click)="logout()">Logout</button>
+		</div>
+		<div class="alerts-list">
+			<h3>Active SOS Alerts</h3>
+			<ul>
+				<li *ngFor="let alert of alerts">
+					<strong>ID:</strong> {{ alert.id }} | <strong>Lat:</strong> {{ alert.lat }} | <strong>Lon:</strong> {{ alert.lon }} | <strong>Time:</strong> {{ alert.timestamp | date:'short' }}
+				</li>
+			</ul>
+		</div>
+		<div id="map"></div>
+	</div>
+</div>

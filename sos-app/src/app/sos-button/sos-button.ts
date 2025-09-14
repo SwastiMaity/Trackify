@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./sos-button.css']
 })
 export class SosButton {
+  smsLink: string | null = null;
   loading = false;
   lastCoords: { lat: number; lon: number; timestamp: string } | null = null;
   errorMsg: string | null = null;
@@ -37,7 +38,6 @@ export class SosButton {
       (pos) => {
         this.loading = false;
         const { latitude, longitude } = pos.coords;
-        // Convert timestamp to ISO format
         const timestamp = new Date(pos.timestamp).toISOString();
 
         this.lastCoords = { lat: latitude, lon: longitude, timestamp };
@@ -53,14 +53,12 @@ export class SosButton {
           }
           const data = await response.json();
           alert('SOS sent! Alert ID: ' + data.id);
+          // Generate SMS deep link and show button
+          this.smsLink = `sms:?body=SOS! I need help at [${latitude}, ${longitude}]`;
         })
         .catch((err) => {
           this.errorMsg = 'SOS request failed: ' + err.message;
         });
-
-        // 📱 Generate SMS deep link
-        const smsLink = `sms:?body=SOS! I need help at [${latitude}, ${longitude}]`;
-        window.location.href = smsLink;
       },
       (err) => {
         this.loading = false;
@@ -69,6 +67,13 @@ export class SosButton {
     );
   }
 
+  sendViaSMS() {
+    if (this.smsLink) {
+      window.location.href = this.smsLink;
+    }
+  }
+
+  // --- Alert Management Methods ---
   // --- Alert Management Methods ---
   async getAllAlerts() {
     try {
