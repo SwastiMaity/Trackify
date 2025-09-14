@@ -71,13 +71,20 @@ export class Responder implements AfterViewInit, OnDestroy {
         if (this.map) {
           this.markers.forEach(m => m.remove());
           this.markers = [];
-          // Add new markers
+          // Add new markers for each SOS location
           data.forEach(alert => {
-            const marker = L.marker([alert.lat, alert.lon], { icon: redIcon })
-              .bindPopup(`SOS received at ${alert.timestamp}`)
-              .addTo(this.map);
-            this.markers.push(marker);
+            if (alert.lat && alert.lon) {
+              const marker = L.marker([alert.lat, alert.lon], { icon: redIcon })
+                .bindPopup(`SOS received at ${alert.timestamp}<br>ID: ${alert.id}`)
+                .addTo(this.map);
+              this.markers.push(marker);
+            }
           });
+          // Optionally, fit map to markers if there are any
+          if (this.markers.length > 0) {
+            const group = L.featureGroup(this.markers);
+            this.map.fitBounds(group.getBounds().pad(0.2));
+          }
         }
       })
       .catch(err => console.error('Error fetching alerts:', err));
