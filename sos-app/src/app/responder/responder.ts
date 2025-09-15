@@ -21,6 +21,9 @@ export class Responder implements AfterViewInit, OnDestroy {
 
   // Alerts and map
   alerts: any[] = [];
+  displayedAlerts: any[] = [];
+  filterStatus: 'active' | 'all' = 'active';
+  sortOrder: 'asc' | 'desc' = 'desc';
   private map!: L.Map;
   private markers: L.Marker[] = [];
   private intervalId: any;
@@ -67,12 +70,13 @@ export class Responder implements AfterViewInit, OnDestroy {
       .then(res => res.json())
       .then((data: any[]) => {
         this.alerts = data;
+        this.applyFilterAndSort();
         // Remove old markers
         if (this.map) {
           this.markers.forEach(m => m.remove());
           this.markers = [];
           // Add new markers for each SOS location
-          data.forEach(alert => {
+          this.displayedAlerts.forEach(alert => {
             if (alert.lat && alert.lon) {
               const marker = L.marker([alert.lat, alert.lon], { icon: redIcon })
                 .bindPopup(`SOS received at ${alert.timestamp}<br>ID: ${alert.id}`)
@@ -88,6 +92,22 @@ export class Responder implements AfterViewInit, OnDestroy {
         }
       })
       .catch(err => console.error('Error fetching alerts:', err));
+  }
+  applyFilterAndSort() {
+    let filtered = this.filterStatus === 'active'
+      ? this.alerts.filter(a => (a.status === 'active' || !a.status))
+      : [...this.alerts];
+    filtered.sort((a, b) => {
+      const tA = new Date(a.timestamp).getTime();
+      const tB = new Date(b.timestamp).getTime();
+      return this.sortOrder === 'asc' ? tA - tB : tB - tA;
+    });
+    this.displayedAlerts = filtered;
+  }
+
+  toggleSortOrder() {
+    this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+    this.applyFilterAndSort();
   }
 
   ngAfterViewInit(): void {

@@ -19,18 +19,39 @@
 			<button (click)="logout()">Logout</button>
 		</div>
 		<div class="alerts-list">
-			<h3>Active SOS Alerts</h3>
+			<h3>SOS Alerts</h3>
+			<div class="alerts-controls">
+				<label>
+					Filter:
+					<select [(ngModel)]="filterStatus" (change)="applyFilterAndSort()">
+						<option value="active">Active</option>
+						<option value="all">All</option>
+					</select>
+				</label>
+				<button (click)="toggleSortOrder()">Sort by Time {{ sortOrder === 'asc' ? '↑' : '↓' }}</button>
+			</div>
 			<div class="alerts-card">
-				<ul>
-					<li *ngFor="let alert of alerts" class="alert-item">
-						<div>
-							<span class="alert-id">ID: {{ alert.id }}</span>
-							<span class="alert-coords">Lat: {{ alert.lat }} | Lon: {{ alert.lon }}</span>
-							<span class="alert-time">Time: {{ alert.timestamp | date:'short' }}</span>
-						</div>
-					</li>
-				</ul>
-				<div *ngIf="alerts.length === 0" class="no-alerts">No active SOS alerts.</div>
+				<table class="alerts-table">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Latitude</th>
+							<th>Longitude</th>
+							<th (click)="toggleSortOrder()" style="cursor:pointer">Timestamp {{ sortOrder === 'asc' ? '↑' : '↓' }}</th>
+							<th>Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngFor="let alert of displayedAlerts">
+							<td>{{ alert.id }}</td>
+							<td>{{ alert.lat }}</td>
+							<td>{{ alert.lon }}</td>
+							<td>{{ alert.timestamp | date:'short' }}</td>
+							<td>{{ alert.status || 'active' }}</td>
+						</tr>
+					</tbody>
+				</table>
+				<div *ngIf="displayedAlerts.length === 0" class="no-alerts">No alerts found.</div>
 			</div>
 		</div>
 		<div class="map-container">
