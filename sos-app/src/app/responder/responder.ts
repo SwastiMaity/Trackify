@@ -69,6 +69,7 @@ export class Responder implements AfterViewInit, OnDestroy {
     fetch('https://olivaceous-bobette-winterless.ngrok-free.app/alerts')
       .then(res => res.json())
       .then((data: any[]) => {
+        console.log(data);
         this.alerts = data;
         this.applyFilterAndSort();
         // Remove old markers
@@ -95,7 +96,7 @@ export class Responder implements AfterViewInit, OnDestroy {
   }
   applyFilterAndSort() {
     let filtered = this.filterStatus === 'active'
-      ? this.alerts.filter(a => (a.status === 'active' || !a.status))
+      ? this.alerts.filter(a => a.status === 'new' || a.status === 'active' || !a.status)
       : [...this.alerts];
     filtered.sort((a, b) => {
       const tA = new Date(a.timestamp).getTime();
