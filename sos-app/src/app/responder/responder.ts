@@ -62,14 +62,22 @@ export class Responder implements AfterViewInit, OnDestroy {
       attribution: '© OpenStreetMap contributors'
     }).addTo(this.map);
     this.fetchAlerts();
-    this.intervalId = setInterval(() => this.fetchAlerts(), 5000);
+    this.intervalId = setInterval(() => this.fetchAlerts(), 10000);
   }
 
   fetchAlerts() {
-    fetch('https://olivaceous-bobette-winterless.ngrok-free.app/alerts')
-      .then(res => res.json())
-      .then((data: any[]) => {
-        console.log(data);
+    (async () => {
+      console.log('Fetching alerts from API...');
+      try {
+        const res = await fetch('https://olivaceous-bobette-winterless.ngrok-free.app/alerts', {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' }
+        });
+        console.log('API response status:', res.status);
+        console.log('API response headers:', res.headers);
+        if (!res.ok) throw new Error('Failed to fetch alerts');
+        const data = await res.json();
+        console.log('Parsed alerts data:', data);
         this.alerts = data;
         this.applyFilterAndSort();
         // Remove old markers
@@ -91,8 +99,10 @@ export class Responder implements AfterViewInit, OnDestroy {
             this.map.fitBounds(group.getBounds().pad(0.2));
           }
         }
-      })
-      .catch(err => console.error('Error fetching alerts:', err));
+      } catch (err: any) {
+        console.error('Error fetching alerts:', err);
+      }
+    })();
   }
   applyFilterAndSort() {
     let filtered = this.filterStatus === 'active'
