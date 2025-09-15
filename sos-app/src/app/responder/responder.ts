@@ -21,6 +21,9 @@ export class Responder implements AfterViewInit, OnDestroy {
 
   // Alerts and map
   alerts: any[] = [];
+  displayedAlerts: any[] = [];
+  filterStatus: 'active' | 'all' = 'active';
+  sortOrder: 'asc' | 'desc' = 'desc';
   private map!: L.Map;
   private markers: L.Marker[] = [];
   private intervalId: any;
@@ -59,20 +62,30 @@ export class Responder implements AfterViewInit, OnDestroy {
       attribution: '© OpenStreetMap contributors'
     }).addTo(this.map);
     this.fetchAlerts();
-    this.intervalId = setInterval(() => this.fetchAlerts(), 5000);
+    this.intervalId = setInterval(() => this.fetchAlerts(), 10000);
   }
 
   fetchAlerts() {
-    fetch('https://olivaceous-bobette-winterless.ngrok-free.app/alerts')
-      .then(res => res.json())
-      .then((data: any[]) => {
+    (async () => {
+      console.log('Fetching alerts from API...');
+      try {
+        const res = await fetch('https://olivaceous-bobette-winterless.ngrok-free.app/alerts', {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' }
+        });
+        console.log('API response status:', res.status);
+        console.log('API response headers:', res.headers);
+        if (!res.ok) throw new Error('Failed to fetch alerts');
+        const data = await res.json();
+        console.log('Parsed alerts data:', data);
         this.alerts = data;
+        this.applyFilterAndSort();
         // Remove old markers
         if (this.map) {
           this.markers.forEach(m => m.remove());
           this.markers = [];
           // Add new markers for each SOS location
-          data.forEach(alert => {
+          this.displayedAlerts.forEach(alert => {
             if (alert.lat && alert.lon) {
               const marker = L.marker([alert.lat, alert.lon], { icon: redIcon })
                 .bindPopup(`SOS received at ${alert.timestamp}<br>ID: ${alert.id}`)
@@ -86,8 +99,26 @@ export class Responder implements AfterViewInit, OnDestroy {
             this.map.fitBounds(group.getBounds().pad(0.2));
           }
         }
-      })
-      .catch(err => console.error('Error fetching alerts:', err));
+      } catch (err: any) {
+        console.error('Error fetching alerts:', err);
+      }
+    })();
+  }
+  applyFilterAndSort() {
+    let filtered = this.filterStatus === 'active'
+      ? this.alerts.filter(a => a.status === 'new' || a.status === 'active' || !a.status)
+      : [...this.alerts];
+    filtered.sort((a, b) => {
+      const tA = new Date(a.timestamp).getTime();
+      const tB = new Date(b.timestamp).getTime();
+      return this.sortOrder === 'asc' ? tA - tB : tB - tA;
+    });
+    this.displayedAlerts = filtered;
+  }
+
+  toggleSortOrder() {
+    this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+    this.applyFilterAndSort();
   }
 
   ngAfterViewInit(): void {
