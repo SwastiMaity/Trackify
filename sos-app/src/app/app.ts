@@ -1,19 +1,15 @@
 import { Component } from '@angular/core';
 import { SosButton } from './sos-button/sos-button';
-import { bootstrapApplication } from '@angular/platform-browser';
-import { provideRouter, RouterModule } from '@angular/router';
-import { routes } from './app-router';
+import { Responder } from './responder/responder';
+
+import { RouterModule } from '@angular/router';
+
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [SosButton ,RouterModule],             // ✅ import child component
-
+  imports: [SosButton, Responder, RouterModule],
   templateUrl: './app.html',
-  styleUrls: ['./app.css'],
-  template: `<router-outlet></router-outlet>`
+  styleUrls: ['./app.css']
 })
 export class AppComponent {}
-bootstrapApplication(AppComponent, {
-  providers: [provideRouter(routes)]
-});
